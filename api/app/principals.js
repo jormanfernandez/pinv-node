@@ -202,16 +202,23 @@ const validation = data => {
  * Si enviamos entropy como true, la longitud se duplica
  * @param length {Number}
  * @param entropy {bool}
+ * @param excluded {array}
  * @return String
  * **************
  **/
-const createId = (length, entropy) => {
+const createId = (length, entropy, excluded) => {
 
   let base = "M7r53SVEmdiIcQu8DGn-CwvbykloOha9Ze0NPBXjstW42YHxTK_1pAzJRfq6LgUF";
   let str = "";
 
   while(str.length != length) {
-    str += base.charAt(randomNumber(0, base.length -1));
+
+    let char = base.charAt(randomNumber(0, base.length -1));
+
+    if(excluded && excluded.indexOf(char) > -1)
+      continue;
+    
+    str += char;
   }
 
   if(entropy) {
@@ -226,5 +233,6 @@ module.exports = {
   ltrim,
   rtrim,
   randomNumber,
-  validation
+  validation,
+  createId
 };

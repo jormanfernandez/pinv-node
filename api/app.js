@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const app = express();
-const cookieParser = require('cookie-parser');
+const cookieParser = require("cookie-parser");
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -9,34 +9,102 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(cookieParser(config.cookieSecret));
+app.use(cookieParser());
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
+
+/**
+ * ***********
+ * Cookie handler
+ * ***********
+ **/
 app.use((req, res, next) => {
 
-	let cookie = req.cookies.lct;
-	let {createId, isEmpty} = require("app/principals");
+	let name = "ucc";
+	let value = req.cookies ? req.cookies[name] : undefined;
 
-	if(cookie, !isEmpty(cookie)) {
+	console.log(value);
+
+	if(value) {
+		
+		res.locals.session = value;
+		res.locals.user = {
+			logged: false
+		}
+
+		const Session = require("./models/Sessions");
+		Session.findOne({id: value}, (err, data) => {
+
+			if(err) {
+
+				res.send({
+					code: 500,
+					message: `Error detectando usuario: ${err}`
+				})
+				return;
+			}
+
+			if(!data) {
+				res.locals.user = {
+					logged: false
+				}
+				next();
+				return;
+			}
+
+			const User = require("./models/User");
+
+			User.findOne({_id: data.toJSON().user}, (err, user) => {
+
+				if(err) {
+					res.send({
+						code: 500,
+						message: `Error buscando usuario: ${err}`
+					});
+					return;
+				}
+
+				if(!user) {
+					res.send({
+						code: 500,
+						message: `Usuario no encontrado`
+					});
+					return;
+				}
+
+				res.locals.user = Object.assign({logged: true}, user.toJSON());
+				next();
+			});
+		});
 		return;
 	}
 
-	res.cookie(
-		"lct", 
-		createId(30, true), 
-		{
-			maxAge: 1000 * 60 * 60 * 24 * 365,
-			signed: true,
-			httpOnly: true
-		}
-	)
+	const {createId} = require("./app/principals");
+	value = createId(45, true, ["-", "_"]);
+	res.cookie(name, value);
+	res.locals.session = value;
+	res.locals.user = {
+		logged: false
+	}
+	next();
+});
+
+app.use("/cookie", (req, res) => {
+	res.send({
+		code: 200,
+		message: req.cookies
+	})
 });
 
 const mongoose = require("mongoose");
 const dbUrl = `${process.env.DB_HOST}:${process.env.DB_PORT}`;
 
-/*Creamos la conexion a Mongo*/
+/**
+ * ***********
+ * Creamos la conexion a Mongo
+ * ***********
+ **/
 (async () => {
 	try {
 		await mongoose.connect(
@@ -62,7 +130,6 @@ db.on("error", resolve => {
 	throw new Error(resolve);
 });
 db.once("open", () => {
-
 	const middlewares = require('./middlewares.js');
 	console.log("********* Connected to MongoDB");
 

@@ -4,6 +4,15 @@ const router = express.Router();
 
 router.post("/user/login", async (req, res) => {
 
+	if(res.locals.user.logged) {
+
+		res.send({
+			code: 500,
+			message: `Usuario: ${res.locals.user.nick} ya logueado`
+		})
+		return;
+	}
+
 	const {validation, trim} = require("../app/principals");
 
 	let param = req.body;
@@ -61,13 +70,21 @@ router.post("/user/login", async (req, res) => {
 			return;
 		}
 
-		res.send({
-			code: 500,
-			message: `Ending service: ${param.nick} - ${param.pass}`
-		});
-	}).select({
-		_id: true,
-		pwd: true
+		user.logIn(res.locals.session, (err, response) => {
+
+			if(err) {
+				res.send({
+					code: 500,
+					message: `Error logueando usuario: ${err}`
+				});
+				return;
+			}
+
+			res.send({
+				code: 500,
+				message: `Se intento loguear el usuario`
+			});
+		});		
 	});
 })
 
