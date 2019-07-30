@@ -1,7 +1,7 @@
 {
   "name": "client",
   "version": "1.0.0",
-  "description": "Siga Client",
+  "description": "PINV System",
   "author": "jota-gil",
   "private": true,
   "scripts": {
