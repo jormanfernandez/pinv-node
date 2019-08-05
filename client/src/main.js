@@ -71,6 +71,15 @@ new Vue({
     },
     removeFromPrompts: function (idx) {
       this.prompts.splice(idx, 1)
+    },
+    generateToken: function () {
+      this.axios.get('/token').then(res => {
+        if (res.data.code !== 200) {
+          console.error(res.data.message)
+          return
+        }
+        window.localStorage.setItem('token', res.data.message)
+      })
     }
   },
   computed: {
@@ -88,6 +97,29 @@ new Vue({
         'Content-Type': 'application/json'
       }
     })
+    this.axios.interceptors.request.use(config => {
+      let token = window.localStorage.getItem('token')
+      token = token || '0'
+      config.headers.Authorization = token
+      return config
+    }, error => {
+      return Promise.reject(error)
+    })
+    this.axios.interceptors.response.use(response => {
+      if (response.status !== 200 || response.data.code !== 200) {
+        return response
+      }
+      if (!response.data.tokenExpired) {
+        return response
+      }
+      this.generateToken()
+      return response
+    })
+    let token = window.localStorage.getItem('token')
+    if (!isEmpty(token) && token !== 'undefined') {
+      return
+    }
+    this.generateToken()
   },
   mounted: function () {
     console.log(this)

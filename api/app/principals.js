@@ -22,7 +22,7 @@ const isEmpty = (val) => {
       return !clean
 
     default:
-      return (val == null || val.toString().replace(/^\s+|\s+$/gm, '').length === 0)
+      return (val == null || val.toString().replace(/^\s+|\s+browser/gm, '').length === 0)
   }
 }
 
@@ -33,7 +33,7 @@ const isEmpty = (val) => {
  * @return bool
  * **************
  **/
-const trim = text => text.replace(/^\s+|\s+$/g, "");
+const trim = text => text.replace(/^\s+|\s+browser/g, "");
 
 /**
  * **************
@@ -85,7 +85,7 @@ const ltrim = (text, character) => {
 const rtrim = (text, character) => {
 
   if (!character) {
-    return text.replace(/\s+$/, "");
+    return text.replace(/\s+browser/, "");
   }
 
   let result = "",
@@ -148,7 +148,7 @@ const validation = data => {
     if(Object.getPrototypeOf(opt.value) !== opt.type.prototype) {
       rsp = {
         rsp: false,
-        data: `${field} tiene un valor incorrecto`
+        data: `campo ${field} tiene un valor incorrecto`
       } 
       break;
     }
@@ -156,7 +156,7 @@ const validation = data => {
     if (isEmpty(opt.value) && !opt.empty) {
       rsp = {
         rsp: false,
-        data: `${field} no puede estar vacio`
+        data: `campo ${field} no puede estar vacio`
       } 
       break;
     }
@@ -168,7 +168,7 @@ const validation = data => {
       if (email.length != 2 || email[1].split(".").length != 2) {
         rsp = {
           rsp: false,
-          data: `${field} no es un email valido`
+          data: `campo ${field} no es un email valido`
         } 
         break;
       }
@@ -178,7 +178,7 @@ const validation = data => {
 
       rsp = {
         rsp: false,
-        data: `${field} es menor a ${opt.gt}`
+        data: `campo ${field} es menor a campo ${opt.gt}`
       } 
       break;
     }
@@ -187,7 +187,7 @@ const validation = data => {
 
       rsp = {
         rsp: false,
-        data: `${field} es mayor a ${opt.lt}`
+        data: `campo ${field} es mayor a campo ${opt.lt}`
       } 
       break;
     }
@@ -228,11 +228,25 @@ const createId = (length, entropy, excluded) => {
   return str;
 }
 
+const detectIp = req => {
+
+  let ip = req.headers['x-forwarded-for'] || 
+     req.connection.remoteAddress || 
+     req.socket.remoteAddress ||
+     (req.connection.socket ? req.connection.socket.remoteAddress : null);
+
+     return ip
+}
+
+const detectBrowser = req => req.headers['user-agent'];
+
 module.exports = {
   trim,
   ltrim,
   rtrim,
   randomNumber,
   validation,
-  createId
+  createId,
+  detectIp,
+  detectBrowser
 };

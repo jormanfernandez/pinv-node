@@ -1,14 +1,19 @@
-import Person from './Person'
-
 class User {
   constructor (data) {
+    this.logged = false
+
+    if (!data) {
+      return
+    }
+
     this.Build(data)
   }
   Build (data) {
-    this.logged = false
-    this.nick = ''
-    this.profile = 0
-    this.owner = new Person(data ? data.person || {} : {})
+    console.log(data)
+
+    this.logged = data.logged
+    this.nick = data.nick
+    this.access = data.access
   }
 }
 export default User

@@ -34,13 +34,12 @@ export default {
         nick: this.nick,
         pass: this.pass
       })).then(res => {
-        console.log(res)
-        if (res.data.status !== 200) {
+        if (res.data.code !== 200) {
           this.error = res.data.message
           return
         }
 
-        this.$root.user.Build(res.data.user)
+        this.$root.user.Build(Object.assign({logged: true}, res.data.message))
       }).catch(err => {
         alert(`Ha ocurrido un error: ${err}`)
         console.warn(err)

@@ -5,7 +5,13 @@ const cookieParser = require("cookie-parser");
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  res.header("Access-Control-Allow-Headers", [
+  	"Origin", 
+  	"X-Requested-With", 
+  	"Content-Type", 
+  	"Accept", 
+  	"Authorization"
+  	].join(", "));
   next();
 });
 
@@ -16,85 +22,91 @@ app.use(express.json());
 
 /**
  * ***********
- * Cookie handler
+ * Session handler
  * ***********
  **/
-app.use((req, res, next) => {
+app.use("/api", async (req, res, next) => {
 
-	let name = "ucc";
-	let value = req.cookies ? req.cookies[name] : undefined;
+	const excludedMethods = [
+		"OPTIONS"
+	];
 
-	console.log(value);
+	const excludedPath = [
+		"/api/token"
+	];
 
-	if(value) {
-		
-		res.locals.session = value;
-		res.locals.user = {
-			logged: false
-		}
-
-		const Session = require("./models/Sessions");
-		Session.findOne({id: value}, (err, data) => {
-
-			if(err) {
-
-				res.send({
-					code: 500,
-					message: `Error detectando usuario: ${err}`
-				})
-				return;
-			}
-
-			if(!data) {
-				res.locals.user = {
-					logged: false
-				}
-				next();
-				return;
-			}
-
-			const User = require("./models/User");
-
-			User.findOne({_id: data.toJSON().user}, (err, user) => {
-
-				if(err) {
-					res.send({
-						code: 500,
-						message: `Error buscando usuario: ${err}`
-					});
-					return;
-				}
-
-				if(!user) {
-					res.send({
-						code: 500,
-						message: `Usuario no encontrado`
-					});
-					return;
-				}
-
-				res.locals.user = Object.assign({logged: true}, user.toJSON());
-				next();
-			});
-		});
+	if (excludedMethods.indexOf(req.method) > -1 || excludedPath.indexOf(req.originalUrl) > -1) {
+		next();
 		return;
 	}
 
-	const {createId} = require("./app/principals");
-	value = createId(45, true, ["-", "_"]);
-	res.cookie(name, value);
-	res.locals.session = value;
 	res.locals.user = {
 		logged: false
 	}
-	next();
-});
 
-app.use("/cookie", (req, res) => {
-	res.send({
-		code: 200,
-		message: req.cookies
-	})
+	console.log("***** method: ", req.method);
+	console.log("***** uri: ", req.originalUrl);
+
+	let oAuth = req.get("Authorization");
+
+	if (!oAuth) {
+		res.send({
+			code: 200,
+			tokenExpired: true
+		})
+		return;
+	}
+
+	const Session = require("./models/Sessions");
+
+	const {detectIp, detectBrowser, createId} = require("./app/principals");
+	const ip = detectIp(req);
+	const browser = detectBrowser(req);
+
+	let response = "";
+
+	try {
+		response = await Session.findOne({ id: oAuth, browser: browser, ip: ip });
+	} catch (e) {
+		next();
+		return;
+	}
+
+	if (!response) {
+		res.send({
+			code: 200,
+			tokenExpired: true
+		})
+		return;
+	}
+
+	res.locals.session = oAuth;
+
+	if(!response.user) {
+		next();
+		return;
+	}
+
+	const User = require("./models/User");
+
+	let user = "";
+
+	try {
+		user = await User.findeOne({_id: response.user});
+
+		if (!user) {
+			next();
+			return;
+		}
+	} catch (e) {
+		console.error("Error obteniendo usuario: ", e)
+		next();
+		return;
+	}
+
+	res.locals.user = Object.assign(user, {logged: true});
+	console.log(res.locals);
+	next();
 });
 
 const mongoose = require("mongoose");
@@ -129,6 +141,7 @@ const db = mongoose.connection;
 db.on("error", resolve => {
 	throw new Error(resolve);
 });
+
 db.once("open", () => {
 	const middlewares = require('./middlewares.js');
 	console.log("********* Connected to MongoDB");
@@ -141,7 +154,27 @@ db.once("open", () => {
 	/**/
 
 
+	/**
+	 * No queremos acumular sesiones basura
+	 * Asi que buscamos las sesiones 
+	 * que no han sido utilizadas en los ultimos 2 dias
+	 */
+	const gc = setInterval(() => {
+
+		const Session = require("./models/Sessions");
+
+		let date = new Date();
+		date.setTime(date.getTime() - (1000 * 60 * 60 * 24 * 2))
+		Session.find({
+			last_access: {
+				$lte: date
+			}
+		}).deleteMany().exec()
+	}, 1000 * 60 * 60)
+
+
 	app.listen(8080, () => {
 	  console.log(`********* Server up and running`);
 	});
+
 });
