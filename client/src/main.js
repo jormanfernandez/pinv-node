@@ -26,7 +26,7 @@ new Vue({
       prompts: [],
       confirms: [],
       user: new User(),
-      menu: [
+      mainAccess: [
         {
           url: '/',
           name: 'Inicio'
@@ -80,11 +80,59 @@ new Vue({
         }
         window.localStorage.setItem('token', res.data.message)
       })
+    },
+    loadTokenUser: function () {
+      this.axios.get('/user/token').then(res => {
+        if (res.data.code !== 200) {
+          console.error('Error cargando usuario', res.data)
+          return
+        }
+
+        this.user.Build(Object.assign({logged: true}, res.data.message))
+      })
+    }
+  },
+  watch: {
+    'user.logged': function (value) {
+      if (!value) {
+        this.user.access = []
+        return
+      }
+
+      const index = this.user.access.findIndex(route => {
+        return route.url === '/user/logout'
+      })
+
+      if (index < 0) {
+        this.user.access.push({
+          url: '/user/logout',
+          name: 'Salir'
+        })
+      }
     }
   },
   computed: {
     apiRoute: function () {
       return `${this.api.url}:${this.api.port}/api`
+    },
+    routeAvailable: function () {
+      const path = this._route.fullPath
+      const excludedpath = [
+        '/'
+      ]
+
+      if (excludedpath.indexOf(path) > -1) {
+        return true
+      }
+
+      return true
+    },
+    menu: function () {
+      if (!Array.isArray(this.user.access)) {
+        return this.mainAccess
+      }
+
+      return this.mainAccess.concat(this.user.access)
     }
   },
   router,
@@ -117,6 +165,7 @@ new Vue({
     })
     let token = window.localStorage.getItem('token')
     if (!isEmpty(token) && token !== 'undefined') {
+      this.loadTokenUser()
       return
     }
     this.generateToken()

@@ -4,10 +4,19 @@
     <hr>
     <div v-if="$root.user.logged">
       <keep-alive>
-        <router-view/>
+        <div v-if="$root.routeAvailable">
+          <router-view/>
+        </div>
+        <div v-else>
+          <p>
+            Lo siento, {{$root.user.nick}}. No puede acceder a esta ruta
+          </p>
+        </div>
       </keep-alive>
     </div>
-    <userLogin v-else></userLogin>
+    <div v-else>
+      <userLogin></userLogin>
+    </div>
   </div>
 </template>
 

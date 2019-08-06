@@ -64,4 +64,76 @@ router.get("/token", async (req, res) => {
 	
 });
 
+router.get("/user/token/", async (req, res) => {
+
+	const excludedMethods = [
+		"OPTIONS"
+	];
+
+	if (excludedMethods.indexOf(req.method) > -1) {
+		next();
+		return;
+	}
+
+	let oAuth = req.get("Authorization");
+	const Session = require("./../models/Sessions");
+
+	const {detectIp, detectBrowser, createId} = require("./../app/principals");
+	const ip = detectIp(req);
+	const browser = detectBrowser(req);
+
+	let response = "";
+
+	try {
+		response = await Session.findOne({ id: oAuth, browser: browser, ip: ip }, {user: true});
+	} catch (e) {
+		res.send({
+			code: 500,
+			message: `Error leyendo sesion: ${e}`
+		})
+		return;
+	}
+
+	console.log(response);
+
+	if (!response) {
+		res.send({
+			code: 200,
+			tokenExpired: true
+		})
+		return;
+	}
+
+	const User = require("./../models/User");
+	let user = "";
+
+	try {
+
+		user = await User.findOne({_id: response.user});
+
+		if (!user) {
+			res.send({
+				code: 500,
+				message: `No user`
+			});
+			return;
+		}
+
+	} catch (e) {
+		res.send({
+			code: 500,
+			message: `Error obteniendo usuario: ${e}`
+		});
+		return;
+	}
+
+	res.send({
+		code: 200,
+		message: {
+			access: user.access,
+			nick: user.nick
+		}
+	});
+});
+
 module.exports = router;

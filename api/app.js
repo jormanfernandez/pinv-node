@@ -92,7 +92,7 @@ app.use("/api", async (req, res, next) => {
 	let user = "";
 
 	try {
-		user = await User.findeOne({_id: response.user});
+		user = await User.findOne({_id: response.user});
 
 		if (!user) {
 			next();
@@ -105,7 +105,6 @@ app.use("/api", async (req, res, next) => {
 	}
 
 	res.locals.user = Object.assign(user, {logged: true});
-	console.log(res.locals);
 	next();
 });
 
