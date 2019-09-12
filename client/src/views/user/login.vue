@@ -41,11 +41,12 @@ export default {
 
         this.$root.user.Build(Object.assign({logged: true}, res.data.message))
       }).catch(err => {
-        alert(`Ha ocurrido un error: ${err}`)
+        this.$root.alert({
+          text: `Ha ocurrido un error: ${err}`
+        })
         console.warn(err)
       }).finally(() => {
         this.sending = false
-        console.log('done')
       })
     }
   },

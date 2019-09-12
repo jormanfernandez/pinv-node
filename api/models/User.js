@@ -20,6 +20,19 @@ userSchema.methods.logIn = function (session, callback) {
 	}, callback);
 }
 
+userSchema.methods.logOut = function (session, callback) {
+
+	const Session = require("./Sessions");
+	return Session.updateOne({
+		id: session
+	}, {
+		user: null,
+		last_access: new Date()
+	}, {
+		upsert: true
+	}, callback);
+}
+
 const User = mongoose.model("users", userSchema);
 
 module.exports = User;

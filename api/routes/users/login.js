@@ -4,7 +4,7 @@ const User = require("../../models/User");
 
 router.post("/login", (req, res) => {
 
-	const {validation, trim} = require("../../app/principals");
+	const {validation, trim, junkPassword} = require("../../app/principals");
 
 	let param = req.body;
 	let validate = validation({
@@ -26,13 +26,9 @@ router.post("/login", (req, res) => {
 		return;
 	}
 
-	const sha256 = require("../../app/sha256");
-	const Cipher = require("../../app/Cipher");
-	let cipher = new Cipher(process.env.SALT);	
-
 	param.nick = trim(param.nick);
 	param.pass = trim(param.pass);
-	param.pass = sha256(cipher.cifrar(param.pass)); 
+	param.pass = junkPassword(param.pass); 
 
 	/**/
 	User.findOne({nick: param.nick.toLowerCase()}, (err, user) => {
@@ -91,6 +87,74 @@ router.post("/login", (req, res) => {
 	});
 	/**/
 });
+
+router.post("/logout", (req, res) => {
+
+	const {validation, trim} = require("../../app/principals");
+
+	let param = req.body;
+	let validate = validation({
+		nick: {
+			value: param.nick,
+			type: String
+		}
+	});
+
+	if (!validate.rsp) {
+		res.send({
+			code: 500,
+			message: validate.data
+		})
+		return;
+	}
+
+	param.nick = trim(param.nick);
+
+	/**/
+	User.findOne({nick: param.nick.toLowerCase()}, (err, user) => {
+
+		if(err) {
+			res.send({
+				code: 500,
+				message: `Error buscando usuario: ${err}`
+			});
+			return;
+		}
+
+		if(!user) {
+			res.send({
+				code: 500,
+				message: `Usuario no encontrado`
+			});
+			return;
+		}
+
+		user.logOut(res.locals.session, (err, response) => {
+
+			if(err) {
+				res.send({
+					code: 500,
+					message: `Error deslogueando usuario: ${err}`
+				});
+				return;
+			}
+
+			if (!response.ok) {
+
+				res.send({
+					code: 500,
+					message: "Error saliendo de sesion"
+				})
+				return;
+			}
+
+			res.send({
+				code: 200
+			});
+		});		
+	});
+	/**/
+})
 
 
 module.exports = router;

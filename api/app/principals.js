@@ -178,7 +178,7 @@ const validation = data => {
 
       rsp = {
         rsp: false,
-        data: `campo ${field} es menor a campo ${opt.gt}`
+        data: `campo ${field} es menor a ${opt.gt}`
       } 
       break;
     }
@@ -187,7 +187,7 @@ const validation = data => {
 
       rsp = {
         rsp: false,
-        data: `campo ${field} es mayor a campo ${opt.lt}`
+        data: `campo ${field} es mayor a ${opt.lt}`
       } 
       break;
     }
@@ -240,7 +240,18 @@ const detectIp = req => {
 
 const detectBrowser = req => req.headers['user-agent'];
 
+const junkPassword = (password, salt) => {
+
+  const sha256 = require("./sha256");
+  const Cipher = require("./Cipher");
+
+  let cipher = new Cipher(salt ? salt : process.env.SALT);  
+
+  return sha256(cipher.cifrar(password));
+}
+
 module.exports = {
+  isEmpty,
   trim,
   ltrim,
   rtrim,
@@ -248,5 +259,6 @@ module.exports = {
   validation,
   createId,
   detectIp,
-  detectBrowser
+  detectBrowser,
+  junkPassword
 };

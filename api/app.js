@@ -5,6 +5,14 @@ const cookieParser = require("cookie-parser");
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", [
+  	"PUT",
+  	"PATCH",
+  	"POST",
+  	"OPTIONS",
+  	"GET",
+  	"DELETE"
+  ].join(", "));
   res.header("Access-Control-Allow-Headers", [
   	"Origin", 
   	"X-Requested-With", 

@@ -94,8 +94,6 @@ router.get("/user/token/", async (req, res) => {
 		return;
 	}
 
-	console.log(response);
-
 	if (!response) {
 		res.send({
 			code: 200,

@@ -4,8 +4,14 @@
       <h4>PINV</h4>
     </div>
       <ul :class="{'active': show}">
-        <li v-for="(link, idx) in $root.menu" :key="idx">
+        <li>
+          <router-link to="/">Inicio</router-link>
+        </li>
+        <li v-for="(link, idx) in $root.user.access" :key="idx">
           <router-link :to="link.url">{{link.name}}</router-link>
+        </li>
+        <li v-if="$root.user.logged">
+          <a href="#salir" @click.prevent="logout">Salir</a>
         </li>
       </ul>
       <div class="burger" @click="show = !show">
@@ -25,6 +31,29 @@ export default {
   data () {
     return {
       show: false
+    }
+  },
+  methods: {
+    logout () {
+      this.$root.axios.post("/user/logout", JSON.stringify({
+        nick: this.$root.user.nick
+      })).then(res => {
+        if (res.data.code !== 200) {
+          this.$root.alert({
+            text: res.data.message
+          })
+          return
+        }
+
+        this.$root.user.Build({
+          logged: false
+        })
+      }).catch(err => {
+        this.$root.alert({
+          text: `Ha ocurrido un error: ${err}`
+        })
+        console.warn(err)
+      })
     }
   },
   components: {vSelect}
@@ -60,6 +89,7 @@ export default {
     background-color: #5d4954;
     transform: translateX(100%);
     transition: transform 0.5s ease-in;
+    z-index: 1;
   }
 
   nav ul li {

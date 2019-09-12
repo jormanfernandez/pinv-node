@@ -450,3 +450,14 @@ export const randomNumber = (min, max, isFloat) => {
     return Math.ceil(Math.random() * (max - min) + min);
   }
 }
+export const generateId = length => {
+
+  let id = '';
+  let hash = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-_';
+
+  while(id.length < length) {
+    id += hash.charAt(randomNumber(0, hash.length -1));
+  }
+
+  return id;
+}

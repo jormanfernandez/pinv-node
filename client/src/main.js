@@ -6,7 +6,7 @@ import App from './App'
 import router from './router'
 import User from './classes/User'
 import axios from 'axios'
-import {isEmpty} from './classes/mainFunctions'
+import {isEmpty, generateId} from './classes/mainFunctions'
 
 Vue.config.productionTip = false
 Vue.use(VueCookies)
@@ -26,6 +26,7 @@ new Vue({
       prompts: [],
       confirms: [],
       user: new User(),
+      windows: [],
       mainAccess: [
         {
           url: '/',
@@ -45,34 +46,56 @@ new Vue({
     return obj
   },
   methods: {
-    alert: function (options) {
+    blur () {
+      if(document.activeElement) {
+        document.activeElement.blur();
+      }
+    },
+
+    alert (options) {
       this.blur()
+      options.id = generateId(15)
       this.alerts.push(options)
     },
-    removeFromAlert: function (idx) {
-      this.alerts.splice(idx, 1)
+    removeAlert (key) {
+      this.alerts = this.alerts.filter(value => {
+        return value.id != key
+      })
     },
-    confirm: function (options) {
+    window (options) {
+      options.id = generateId(15)
+      this.windows.push(options)
+    },
+    removeWindow () {
+      this.windows = [];
+    },
+    confirm (options) {
       this.blur()
-      this.alerts.push(options)
+      options.id = generateId(15)
+      this.confirms.push(options)
     },
-    removeFromConfirm: function (idx) {
-      this.confirms.splice(idx, 1)
+    removeConfirm (key) {
+      this.confirms = this.confirms.filter(value => {
+        return value.id != key
+      })
     },
-    prompt: function (options) {
+    prompt (options) {
       this.blur()
+      options.id = generateId(15)
       if (isNaN(options.maxlength)) {
         options.maxlength = null
       }
       if (isEmpty(options.placeholder)) {
         options.placeholder = null
       }
-      this.alerts.push(options)
+      this.prompts.push(options)
     },
-    removeFromPrompts: function (idx) {
-      this.prompts.splice(idx, 1)
+    removePrompt (key) {
+      this.prompts = this.prompts.filter(value => {
+        return value.id != key
+      })
     },
-    generateToken: function () {
+    generateToken () {
       this.axios.get('/token').then(res => {
         if (res.data.code !== 200) {
           console.error(res.data.message)
@@ -81,7 +104,7 @@ new Vue({
         window.localStorage.setItem('token', res.data.message)
       })
     },
-    loadTokenUser: function () {
+    loadTokenUser () {
       this.axios.get('/user/token').then(res => {
         if (res.data.code !== 200) {
           console.error('Error cargando usuario', res.data)
@@ -93,29 +116,18 @@ new Vue({
     }
   },
   watch: {
-    'user.logged': function (value) {
+    'user.logged' (value) {
       if (!value) {
         this.user.access = []
         return
       }
-
-      const index = this.user.access.findIndex(route => {
-        return route.url === '/user/logout'
-      })
-
-      if (index < 0) {
-        this.user.access.push({
-          url: '/user/logout',
-          name: 'Salir'
-        })
-      }
     }
   },
   computed: {
-    apiRoute: function () {
+    apiRoute () {
       return `${this.api.url}:${this.api.port}/api`
     },
-    routeAvailable: function () {
+    routeAvailable () {
       const path = this._route.fullPath
       const excludedpath = [
         '/'
@@ -127,7 +139,7 @@ new Vue({
 
       return true
     },
-    menu: function () {
+    menu () {
       if (!Array.isArray(this.user.access)) {
         return this.mainAccess
       }
@@ -138,7 +150,7 @@ new Vue({
   router,
   components: {App},
   template: '<App/>',
-  created: function () {
+  created () {
     this.axios = this.axios.create({
       baseURL: this.apiRoute,
       headers: {
@@ -170,7 +182,7 @@ new Vue({
     }
     this.generateToken()
   },
-  mounted: function () {
+  mounted () {
     console.log(this)
     let screen = document.querySelector('.screen')
     const removeScreen = () => {
