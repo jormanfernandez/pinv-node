@@ -27,20 +27,43 @@ new Vue({
       confirms: [],
       user: new User(),
       windows: [],
-      mainAccess: [
+      routes: [
         {
-          url: '/',
-          name: 'Inicio'
+          url: '/person/create',
+          name: 'Ingresar Persona'
         },
         {
-          url: '/about',
-          name: 'Acerca de nosotros'
+          url: '/person/modify',
+          name: 'Ver y Modificar Persona'
         },
         {
-          url: '/contact',
-          name: 'Contactanos'
-        }
-      ]
+          url: '/user/create',
+          name: 'Crear usuario'
+        },
+        {
+          url: '/user/modify',
+          name: 'Ver y Modificar usuario'
+        },
+        {
+          url: '/category',
+          name: 'Categorias'
+        },
+        {
+          url: '/article/add',
+          name: 'Agregar Articulo al inventario'
+        },
+        {
+          url: '/article/modify',
+          name: 'Ver y Modificar Articulos'
+        },
+        {
+          url: '/article/assign',
+          name: 'Asignar articulos'
+        },
+        {
+          url: '/report',
+          name: 'Reportes'
+        }]
     }
 
     return obj
@@ -138,13 +161,6 @@ new Vue({
       }
 
       return true
-    },
-    menu () {
-      if (!Array.isArray(this.user.access)) {
-        return this.mainAccess
-      }
-
-      return this.mainAccess.concat(this.user.access)
     }
   },
   router,

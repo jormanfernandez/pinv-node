@@ -31,6 +31,23 @@
 				<br>
 				<input type="number" name="cedula" v-model="cedula" placeholder="Cedula" :disabled="isSending">
 			</label>
+			<br>
+
+			<p>Lista de Accesos</p>
+
+			<table>
+				<tr v-for="(route, idx) in this.$root.routes" :key="idx">
+					<td>
+						<label :for="'route/'+route.url">
+							<span>Permitir acceso a: {{route.name}}</span>
+						</label>
+					</td>
+					<td>
+						<input type="checkbox" :id="'route/'+route.url" v-model="access" :value="route">
+					</td>
+				</tr>
+			</table>
+
 			<hr>
 			<input type="submit" value="Guardar" :disabled="isSending">
 		</form>
@@ -130,7 +147,37 @@
 		},
 		methods: {
 			submit () {
+				this.$root.blur()
+				this.username = trim(this.username)
+				this.pwd = trim(this.pwd)
 
+				if (isEmpty(this.username)) {
+					this.$root.alert({
+						text: 'El nick no puede estar vacio'
+					})
+					return
+				}
+
+				if (isEmpty(this.pwd)) {
+					this.$root.alert({
+						text: 'La contraseña no puede estar vacia'
+					})
+					return
+				}
+
+				if (isNaN(this.cedula) || this.cedula < 500000) {
+					this.$root.alert({
+						text: 'La cedula que ingreso es invalida'
+					})
+					return
+				}
+
+				this.$root.axios.post("/user", JSON.stringify({
+					username: this.username,
+					pwd: this.pwd,
+					cedula: this.cedula,
+					access: this.access
+				}))
 			}
 		},
 		computed: {
