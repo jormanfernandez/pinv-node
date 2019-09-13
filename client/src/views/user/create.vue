@@ -63,6 +63,11 @@
 		position: relative;
 	}
 
+	input[type='checkbox'] {
+		width: auto !important;
+    	cursor: pointer;
+	}
+
 	.pass-btn {
 	    background-image: url(/static/assets/eye.png);
 	    background-size: cover;
