@@ -36,6 +36,11 @@
 			<p>Lista de Accesos</p>
 
 			<table>
+				<th>
+					<td colspan="2">
+						<input type="button" value="Marcar todos" @click="markAll">
+					</td>
+				</th>
 				<tr v-for="(route, idx) in this.$root.routes" :key="idx">
 					<td>
 						<label :for="'route/'+route.url">
@@ -115,7 +120,8 @@
 		margin-top: 5%;
 	}
 
-	input[type="submit"] {
+	input[type="submit"],
+	input[type="button"] {
 		margin-top: 10px;
     	position: relative;
 	    border: 0px;
@@ -127,14 +133,18 @@
 	    cursor: pointer;
 	    transition: all 0.2s;
 	  }
-	  input[type="submit"]:hover,
-	  input[type="submit"]:focus,
-	  input[type="submit"]:disabled {
-	    background-color: #8e7b85;
-	  }
-	  input[type="submit"]:focus {
-	    font-size: 19px;
-	  }
+	input[type="submit"]:hover,
+	input[type="submit"]:focus,
+	input[type="submit"]:disabled,
+	input[type="button"]:hover,
+	input[type="button"]:focus,
+	input[type="button"]:disabled {
+		background-color: #8e7b85;
+	}
+	input[type="submit"]:focus,
+	input[type="button"]:focus {
+		font-size: 19px;
+	}
 </style>
 
 <script type="text/javascript">
@@ -151,6 +161,9 @@
 			}
 		},
 		methods: {
+			markAll () {
+				document.querySelectorAll('input[type="checkbox"]').forEach(input => input.setAttribute('checked', true))
+			},
 			submit () {
 				this.$root.blur()
 				this.username = trim(this.username)
