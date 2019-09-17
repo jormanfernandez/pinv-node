@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Person = require("../../models/Person");
 
-router.put("/", (req, res) => {
+router.put("/", async (req, res) => {
 
 	const {validation, trim} = require("../../app/principals");
 
@@ -38,47 +38,47 @@ router.put("/", (req, res) => {
 		return;
 	}
 
-	Person.findOne({
-		cedula: param.cedula
-	}, (err, response) => {
+	let exists = "";
+
+	try {
+		exists = await Person.findOne({cedula: param.cedula});
+	} catch (e) {
+		res.send({
+			code: 500,
+			message: `Error: ${e}`
+		})
+		return;
+	}
+
+	if (exists) {
+		res.send({
+			code: 500,
+			message: 'Esta persona ya se encuentra en el sistema'
+		});
+		return;
+	}
+
+	const person = new Person({
+		nombre: param.nombre,
+		apellido: param.apellido,
+		cedula: param.cedula,
+		created_date: new Date()
+	});
+
+	person.save(err => {
 		if (err) {
 			res.send({
 				code: 500,
-				message: `Error ingresando a la persona: ${err}`
+				message: `Error al ingresar a la persona: ${err}`
 			})
 			return;
 		}
 
-		if (response) {
-			res.send({
-				code: 500,
-				message: 'Esta persona ya se encuentra en el sistema'
-			});
-			return;
-		}
-
-		const person = new Person({
-			nombre: param.nombre,
-			apellido: param.apellido,
-			cedula: param.cedula,
-			created_date: new Date()
-		});
-
-		person.save(err => {
-			if (err) {
-				res.send({
-					code: 500,
-					message: `Error al ingresar a la persona: ${err}`
-				})
-				return;
-			}
-
-			res.send({
-				code: 200,
-				message: 'Persona ingresada exitosamente'
-			})
+		res.send({
+			code: 200,
+			message: 'Persona ingresada exitosamente'
 		})
-	});
+	})
 });
 
 

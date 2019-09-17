@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Person = require("../../models/Person");
 
-router.patch("/", (req, res) => {
+router.patch("/", async (req, res) => {
 
 	const {validation, trim} = require("../../app/principals");
 
@@ -46,62 +46,66 @@ router.patch("/", (req, res) => {
 		return;
 	}
 
-	Person.findOne({
-		cedula: param.cedula,
-		_id: {
-			$ne: param._id
-		}
-	}, (err, response) => {
+	let exists = "";
+
+	try {
+		exists = await Person.findOne({
+			cedula: param.cedula,
+			_id: {
+				$ne: param._id
+			}
+		});
+	} catch (e) {
+		res.send({
+			code: 500,
+			message: `Error ${e}`
+		})
+		return;
+	}
+
+	
+
+	if (exists) {
+		res.send({
+			code: 500,
+			message: 'Ya hay alguien con este numero de cedula'
+		});
+		return;
+	}
+
+	const person = {
+		nombre: param.nombre,
+		apellido: param.apellido,
+		cedula: param.cedula
+	};
+
+	Person.updateOne({
+		_id: param._id
+	}, person, {
+		upsert: false
+	}, (err, update) => {
+
 		if (err) {
 			res.send({
 				code: 500,
-				message: `Error modificando a la persona: ${err}`
-			})
-			return;
-		}
-
-		if (response) {
-			res.send({
-				code: 500,
-				message: 'Ya hay alguien con este numero de cedula'
+				message: err
 			});
 			return;
 		}
 
-		const person = {
-			nombre: param.nombre,
-			apellido: param.apellido,
-			cedula: param.cedula
-		};
-
-		Person.updateOne({
-			_id: param._id
-		}, person, {
-			upsert: false
-		}, (err, update) => {
-
-			if (err) {
-				res.send({
-					code: 500,
-					message: err
-				});
-				return;
-			}
-
-			if (!update.ok) {
-				res.send({
-					code: 500,
-					message: 'No se pudo actualizar a la persona'
-				});
-				return;
-			}
-
+		if (!update.ok) {
 			res.send({
-				code: 200,
-				message: true
-			})
+				code: 500,
+				message: 'No se pudo actualizar a la persona'
+			});
+			return;
+		}
 
-		});
+		res.send({
+			code: 200,
+			message: true
+		})
+
 	});
 });
 
