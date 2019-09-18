@@ -35,24 +35,20 @@
 
       <p>Lista de Accesos</p>
 
-      <table>
-        <th>
-          <td colspan="2">
-            <input type="button" value="Marcar todos" @click="markAll">
-          </td>
-        </th>
-        <tr v-for="(route, idx) in this.$root.routes" :key="idx">
-          <td>
-            <label :for="'route/'+route.url">
-              <span>Permitir acceso a: {{route.name}}</span>
-            </label>
-          </td>
-          <td>
-            <input type="checkbox" :id="'route'+route.url" v-model="access" :value="route">
-          </td>
-        </tr>
-      </table>
+      <input type="button" value="Marcar todos" @click="markAll">
 
+      <div class="access">
+        <div v-for="(route, idx) in this.$root.routes" 
+          :key="idx" 
+          :class="['row', {active: routes.indexOf(route.url) > -1}]">
+          <label :for="'route'+route.url">
+            <p>Permitir acceso a</p>
+            <br>
+            <p>{{route.name}}</p>
+          </label>
+          <input type="checkbox" :id="'route'+route.url" v-model="access" :value="route">
+        </div>  
+      </div>
       <hr>
       <input type="submit" value="Guardar" :disabled="isSending">
     </form>
@@ -67,10 +63,25 @@
     margin-right: auto;
     position: relative;
   }
+  .access {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .row.active {
+    background-color: #d23f555c;
+  }
+  .row {
+    transition: all 0.2s;
+    padding: 5px;
+    margin: 5px;
+    border-radius: 3px;
+    border: 1px solid lightgray;
+    width: 45%;
+  }
 
   input[type='checkbox'] {
     width: auto !important;
-      cursor: pointer;
+    visibility: hidden;
   }
 
   .pass-btn {
@@ -256,6 +267,14 @@
     computed: {
       passwordField () {
         return this.showPwd ? 'text' : 'password'
+      },
+      routes () {
+        let routes = []
+        for (let i in this.access) {
+          routes.push(this.access[i].url)
+        }
+
+        return routes
       }
     }
   }
