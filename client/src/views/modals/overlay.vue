@@ -48,7 +48,7 @@
 		overflow: hidden;
 		top: 0;
 		left: 0;
-		position: absolute;
+		position: fixed;
 		opacity: 0;
 		transition: opacity 0.15s ease;
 		background-color: #0000003d;

@@ -1,5 +1,6 @@
 const middlewares = [
-	require('./login')
+	require('./login'),
+	require('./create'),
 ];
 
 module.exports = middlewares;

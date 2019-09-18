@@ -20,13 +20,19 @@
       <userLogin></userLogin>
     </div>
 
-    <Alert v-for="(value, idx) in $root.alerts" :key="value.id" :data="value"></Alert>
-    <Confirm v-for="(value, idx) in $root.confirms" :key="value.id" :data="value"></Confirm>
-    <Prompt v-for="(value, idx) in $root.prompts" :key="value.id" :data="value"></Prompt>
+    <Alert v-for="value in $root.alerts" :key="value.id" :data="value"></Alert>
+    <Confirm v-for="value in $root.confirms" :key="value.id" :data="value"></Confirm>
+    <Prompt v-for="value in $root.prompts" :key="value.id" :data="value"></Prompt>
 
-    <Window v-for="(value, idx) in $root.windows" :key="value.id" :data="value"></Window>
+    <Window v-for="value in $root.windows" :key="value.id" :data="value"></Window>
   </div>
 </template>
+
+<style scoped>
+  #app {
+    margin-bottom: 30px;
+  }
+</style>
 
 <script>
 import userLogin from './views/user/login'

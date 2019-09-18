@@ -35,7 +35,7 @@ export default {
   },
   methods: {
     logout () {
-      this.$root.axios.post("/user/logout", JSON.stringify({
+      this.$root.axios.post('/user/logout', JSON.stringify({
         nick: this.$root.user.nick
       })).then(res => {
         if (res.data.code !== 200) {
