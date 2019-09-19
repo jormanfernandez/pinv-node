@@ -9,7 +9,7 @@
     <form @submit.prevent="submit">
       <label>
         <span>
-          Username
+          Nick
         </span>
         <br>
         <input type="text" name="username" v-model="username" placeholder="Nombre de Usuario" :disabled="isSending">

@@ -5,6 +5,7 @@ import notFound from '@/views/notFound'
 import personCreate from '@/views/person/create'
 import personModify from '@/views/person/modify'
 import userCreate from '@/views/user/create'
+import userModify from '@/views/user/modify'
 
 Vue.use(Router)
 
@@ -29,6 +30,11 @@ export default new Router({
       path: '/user/create',
       name: 'userCreate',
       component: userCreate
+    },
+    {
+      path: '/user/modify',
+      name: 'userModify',
+      component: userModify
     },
     {
       path: '*',

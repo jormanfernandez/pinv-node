@@ -361,7 +361,7 @@ export default {
             })
       }).finally(() => {
         this.isSending = false
-      });
+      })
     }
   },
   watch: {
