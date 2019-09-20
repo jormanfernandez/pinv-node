@@ -49,6 +49,14 @@ new Vue({
           name: 'Categorias'
         },
         {
+          url: '/department',
+          name: 'Departamento'
+        },
+        {
+          url: '/article/state',
+          name: 'Estado de Articulos'
+        },
+        {
           url: '/article/add',
           name: 'Agregar Articulo al inventario'
         },

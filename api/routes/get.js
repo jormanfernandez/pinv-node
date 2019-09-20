@@ -107,7 +107,10 @@ router.get("/user/token/", async (req, res) => {
 
 	try {
 
-		user = await User.findOne({_id: response.user});
+		user = await User.findOne({_id: response.user}, {
+			password: 0,
+			person: 0
+		});
 
 		if (!user) {
 			res.send({
@@ -127,10 +130,7 @@ router.get("/user/token/", async (req, res) => {
 
 	res.send({
 		code: 200,
-		message: {
-			access: user.access,
-			nick: user.nick
-		}
+		message: user
 	});
 });
 

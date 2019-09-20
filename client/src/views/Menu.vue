@@ -84,7 +84,7 @@ export default {
     width: 30%;
     position: absolute;
     right: 0px;
-    height: 92vh;
+    height: 100%;
     top: 8vh;
     background-color: #5d4954;
     transform: translateX(100%);

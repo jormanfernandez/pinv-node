@@ -6,7 +6,7 @@
 
     <hr>
 
-    <form @submit.prevent="search">
+    <form @submit.prevent="newSearch">
       <label>
         <span>
           Nick
@@ -28,7 +28,7 @@
     <br>
     <hr>
 
-    <template v-if="!modifiying">
+    <template v-if="!modifying">
       <template v-if="list.length < 1">
         <p>No se encontraron resultados</p>
       </template>
@@ -36,7 +36,7 @@
         <div v-for="user in list" :key="user._id" class="user">
           <p class="header">{{user.nick}}</p>
           <div>
-            <a @click.prevent="modifying=user">Modificar</a>
+            <a @click.prevent="setModify(user)">Modificar</a>
           </div>        
         </div>
 
@@ -50,31 +50,33 @@
             Nick
           </span>
           <br>
-          <input type="text" name="username" v-model="username" placeholder="Nombre de Usuario" :disabled="isSending">
+          <input type="text" name="username" v-model="modifyingNick" placeholder="Nombre de Usuario" :disabled="isSending">
         </label>
         <br>
-        <label>
-          <span>
-            Reiniciar contraseña
-          </span>
-          <br>
-          <input type="checkbox" v-model="modifying_pwd" value="reset">
-        </label>
+        <div :class="['row', {active: modifyingPwd}]">
+          <label>
+            <span>
+              Reiniciar contraseña
+            </span>
+            <br>
+            <input type="checkbox" v-model="modifyingPwd" value="reset">
+          </label>
+      </div>
         <br>
         <p>Lista de Accesos</p>
 
         <input type="button" value="Marcar todos" @click="markAll">
 
         <div class="access">
-          <div v-for="(route, idx) in this.$root.routes" 
+          <div v-for="(route, idx) in $root.routes" 
             :key="idx" 
-            :class="['row', {active: false}]">
+            :class="['row', {active: routes.indexOf(route.url) > -1}]">
             <label :for="'route'+route.url">
               <p>Permitir acceso a</p>
               <br>
               <p>{{route.name}}</p>
             </label>
-            <input type="checkbox" :id="'route'+route.url" v-model="access" :value="route">
+            <input type="checkbox" :id="'route'+route.url" v-model="modifyingAccess" :value="route">
           </div>  
         </div>
         <hr>
@@ -116,6 +118,27 @@
     transform: translate(-50%, -50%);
     user-select: none;
         height: 70px;
+  }
+
+  .access {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .row.active {
+    background-color: #d23f555c;
+  }
+  .row {
+    transition: all 0.2s;
+    padding: 5px;
+    margin: 5px;
+    border-radius: 3px;
+    border: 1px solid lightgray;
+    width: 45%;
+  }
+
+  input[type='checkbox'] {
+    width: auto !important;
+    visibility: hidden;
   }
 
   .user {
@@ -235,17 +258,24 @@ export default {
     return {
       isSending: false,
       modifying: null,
-      modifying_pwd: null,
+      modifyingPwd: null,
+      modifyingNick: '',
+      modifyingAccess: [],
       loader: null,
       timmer: null,
       list: [],
-      nick: '',
-      cedula: null
+      cedula: null,
+      nick: ''
     }
   },
   methods: {
+    setModify(user) {
+      this.modifying = user
+      this.modifyingAccess = Object.assign([], user.access)
+      this.modifyingNick = user.nick
+    },
     newSearch () {
-      this.list = null
+      this.list = []
       this.modifying = null
       this.search()
     },
@@ -288,8 +318,98 @@ export default {
       })
     },
     modify () {
+      this.$root.confirm({
+        onCancel: () => this.isSending = false,
+        text: '¿Desea modificar a este usuario?',
+        callback: () => {
+          this.$root.axios.patch("/user", JSON.stringify({
+            nick: this.modifyingNick,
+            _id: this.modifying._id,
+            access: this.modifyingAccess,
+            reset_pwd: this.modifyingPwd ? true : false
+          }))
+          .then(response => {
+            if (response.data.code !== 200) {
+             this.$root.window({
+                message: response.data.message,
+                type: 'error'
+              })
+              return
+            }
+            
+            if (this.$root.user.id == this.modifying._id) {
+              setTimeout(() => {
+                window.location.reload()
+              },1500)
+            }
 
+            this.$root.window({
+              message: 'Los datos han sido actualizados exitosamente',
+              type: 'success'
+            })
+          }).catch(err => {
+            this.$root.window({
+              message: err,
+              type: 'error'
+            })
+          }).finally(() => {
+            this.isSending = false
+          })
+        }
+      })
+    },
+    markAll () {
+      this.$root.blur()
+
+        const checkbox = document.querySelectorAll(`div.access input[type='checkbox']`)
+        const boxes = {marked: [], unmarked: []}
+
+        checkbox.forEach(box => {
+            boxes[box.checked ? 'marked' : 'unmarked'].push(box)
+        })
+
+        if (boxes.marked.length < checkbox.length) {
+          boxes.unmarked.forEach(box => {
+            box.click()
+          })
+        } else {
+          boxes.marked.forEach(box => {
+            box.click()
+          })
+        }
     }
+  },
+  computed: {
+    routes () {
+        let routes = []
+        for (let i in this.modifyingAccess) {
+          routes.push(this.modifyingAccess[i].url)
+        }
+
+        return routes
+      }
+  },
+  watch: {
+    isSending (value) {
+      if (this.timmer) {
+        clearTimeout(this.timmer)
+      }
+
+      if (value) {
+        this.loader = 'display: block;'
+        this.timmer = setTimeout(() => {
+          this.loader = 'display: block; opacity: 1'
+        }, 10)
+      } else {
+        this.loader = 'display: block; opacity: 0'
+        this.timmer = setTimeout(() => {
+          this.loader = null
+        }, 250)
+      }
+    }
+  },
+  created () {
+    this.newSearch()
   }
 }
 </script>

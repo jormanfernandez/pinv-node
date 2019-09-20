@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Person = require("../../models/Person");
+const Department = require("../../models/Department");
 
 router.patch("/", async (req, res) => {
 
@@ -11,30 +11,21 @@ router.patch("/", async (req, res) => {
 	if (!param._id) {
 		res.send({
 			code: 500,
-			message: 'No se encontro la persona a modificar'
+			message: 'No se encontro el departamento a modificar'
 		});
 		return;
 	}
 
 	try {
-		param.cedula = parseInt(param.cedula);
+		param.nombre = trim(param.nombre);
 	} catch (e) {
-		throw new Error(`Error detectando cedula: ${e}`);
+		throw new Error(`Error detectando nombre: ${e}`);
 	}
 
 	let validate = validation({
 		nombre: {
 			value: param.nombre,
 			type: String
-		},
-		apellido: {
-			value: param.apellido,
-			type: String
-		},
-		cedula: {
-			value: param.cedula,
-			type: Number,
-			gt: 500000
 		}
 	});
 
@@ -49,28 +40,11 @@ router.patch("/", async (req, res) => {
 	let exists = "";
 
 	try {
-		exists = await Person.findOne({
-			_id: param._id
-		});
-	} catch (e) {
-		res.send({
-			code: 500,
-			message: `Error ${e}`
-		})
-		return;
-	}
-
-	if (!exists) {
-		res.send({
-			code: 500,
-			message: 'No existe la persona que va a modificar'
-		});
-		return;
-	}	
-
-	try {
-		exists = await Person.findOne({
-			cedula: param.cedula,
+		exists = await Department.findOne({
+			nombre: {
+				$regex: `^${param.nombre}$`,
+				$options: 'i'
+			},
 			_id: {
 				$ne: param._id
 			}
@@ -78,30 +52,26 @@ router.patch("/", async (req, res) => {
 	} catch (e) {
 		res.send({
 			code: 500,
-			message: `Error ${e}`
+			message: `Error: ${e}`
 		})
 		return;
 	}
-
 	
-
 	if (exists) {
 		res.send({
 			code: 500,
-			message: 'Ya hay alguien con este numero de cedula'
+			message: 'Este departamento ya se encuentra en el sistema'
 		});
 		return;
 	}
 
-	const person = {
-		nombre: param.nombre,
-		apellido: param.apellido,
-		cedula: param.cedula
+	const department = {
+		nombre: param.nombre
 	};
 
-	Person.updateOne({
+	Department.updateOne({
 		_id: param._id
-	}, person, {
+	}, department, {
 		upsert: false
 	}, (err, update) => {
 
@@ -116,7 +86,7 @@ router.patch("/", async (req, res) => {
 		if (!update.ok) {
 			res.send({
 				code: 500,
-				message: 'No se pudo actualizar a la persona'
+				message: 'No se pudo actualizar el departamento'
 			});
 			return;
 		}

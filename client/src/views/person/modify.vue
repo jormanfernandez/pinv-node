@@ -55,7 +55,6 @@
     </template>
     <template v-else>
       <div class="modify">
-        <input @click="modifying=null" type="button" value="&lt;" class="back-btn">
         <h1>
           Modificando a {{modifying.nombre}} {{modifying.apellido}}
         </h1>      
@@ -153,8 +152,7 @@
     color: #ececec;
   }
 
-  div.person-list input,
-  .back-btn {
+  div.person-list input {
     width: 20% !important;
     left: 50%;
     transform: translateX(-50%);
@@ -312,7 +310,7 @@ export default {
                 })
           }).finally(() => {
             this.isSending = false
-          });
+          })
         }
       })
     },

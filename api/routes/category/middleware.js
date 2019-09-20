@@ -1,8 +1,7 @@
 const middlewares = [
-	require('./login'),
-	require('./list'),
 	require('./create'),
 	require('./modify'),
+	require('./list')
 ];
 
 module.exports = middlewares;

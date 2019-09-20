@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Person = require("../../models/Person");
+const Category = require("../../models/Category");
 
 router.get("/", (req, res) => {
 
@@ -19,19 +19,6 @@ router.get("/", (req, res) => {
 		}
 	}
 
-	if (param.apellido && !isEmpty(param.apellido)) {
-		search.apellido = {
-			$regex: `.*${param.apellido}.*`,
-			$options: 'ix'
-		}
-	}
-
-	if (!isNaN(param.cedula) && param.cedula > 0) {
-		search.cedula = {
-			$gte: param.cedula
-		}
-	}
-
 	if(param.last && !isEmpty(param.last)) {
 		last  = {
 			'_id': {
@@ -40,7 +27,7 @@ router.get("/", (req, res) => {
 		}
 	}
 
-	const query = Person.find(Object.assign(last, search)).limit(limit);
+	const query = Category.find(Object.assign(last, search)).limit(limit);
 	query.exec((err, response) => {
 		if (err) {
 			res.send({

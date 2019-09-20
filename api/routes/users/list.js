@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const User = require("../../models/User");
 const Person = require("../../models/Person");
 
-router.get("/", (req, res) => {
+router.get("/", async (req, res) => {
 
 	const {isEmpty} = require("../../app/principals");
 
@@ -12,24 +13,29 @@ router.get("/", (req, res) => {
 
 	const limit = 10;
 
-	if (param.nombre && !isEmpty(param.nombre)) {
-		search.nombre = {
-			$regex: `.*${param.nombre}.*`,
+	if (param.nick && !isEmpty(param.nick)) {
+		search.nick = {
+			$regex: `.*${param.nick}.*`,
 			$options: 'ix'
 		}
 	}
 
-	if (param.apellido && !isEmpty(param.apellido)) {
-		search.apellido = {
-			$regex: `.*${param.apellido}.*`,
-			$options: 'ix'
-		}
-	}
+	if (!isNaN(param.cedula) && param.cedula > 500000) {
+		let person = undefined;
 
-	if (!isNaN(param.cedula) && param.cedula > 0) {
-		search.cedula = {
-			$gte: param.cedula
+		try {
+			person = await Person.findOne({cedula: param.cedula});
+
+			if (person) {
+				search.person = person._id;
+			} else {
+				search.person = null
+			}
+		} catch (e) {
+			console.error(`Error buscando persona en usuarios: ${e}`);
 		}
+
+		person = undefined;
 	}
 
 	if(param.last && !isEmpty(param.last)) {
@@ -40,7 +46,9 @@ router.get("/", (req, res) => {
 		}
 	}
 
-	const query = Person.find(Object.assign(last, search)).limit(limit);
+	const query = User.find(Object.assign(last, search), {
+		password: 0
+	}).limit(limit);
 	query.exec((err, response) => {
 		if (err) {
 			res.send({

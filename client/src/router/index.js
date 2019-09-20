@@ -6,6 +6,8 @@ import personCreate from '@/views/person/create'
 import personModify from '@/views/person/modify'
 import userCreate from '@/views/user/create'
 import userModify from '@/views/user/modify'
+import categoryView from '@/views/category/view'
+import departmentView from '@/views/department/view'
 
 Vue.use(Router)
 
@@ -35,6 +37,16 @@ export default new Router({
       path: '/user/modify',
       name: 'userModify',
       component: userModify
+    },
+    {
+      path: '/category',
+      name: 'categoryView',
+      component: categoryView
+    },
+    {
+      path: '/department',
+      name: 'departmentView',
+      component: departmentView
     },
     {
       path: '*',
