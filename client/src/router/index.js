@@ -8,6 +8,7 @@ import userCreate from '@/views/user/create'
 import userModify from '@/views/user/modify'
 import categoryView from '@/views/category/view'
 import departmentView from '@/views/department/view'
+import articleState from '@/views/article/state'
 
 Vue.use(Router)
 
@@ -47,6 +48,11 @@ export default new Router({
       path: '/department',
       name: 'departmentView',
       component: departmentView
+    },
+    {
+      path: '/article/state',
+      name: 'articleState',
+      component: articleState
     },
     {
       path: '*',

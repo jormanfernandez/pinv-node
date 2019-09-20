@@ -99,7 +99,7 @@
         height: 70px;
   }
 
-  .user {
+  .department {
     width: 40%;
     left: 50%;
     transform: translateX(-50%);

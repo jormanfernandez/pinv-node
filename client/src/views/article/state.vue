@@ -1,10 +1,10 @@
 <template>
   <div class="wrapper">
     <h1 v-show="insert">
-      Añadir una nueva categoria
+      Añadir un nuevo estado para un articulo
     </h1>
     <h1 v-show="!insert">
-      Buscar una categoria
+      Buscar un estado para un articulo
     </h1>
 
     <hr>
@@ -17,7 +17,7 @@
       <label>
         <span>Nombre</span>
         <br>
-        <input type="text" placeholder="Nombre de la categoria" v-model="newCat">
+        <input type="text" placeholder="Nombre del estado" v-model="newState">
       </label>
 
       <input type="submit" value="Guardar">
@@ -27,7 +27,7 @@
       <label>
         <span>Nombre</span>
         <br>
-        <input type="text" placeholder="Nombre de la categoria" v-model="searchCat">
+        <input type="text" placeholder="Nombre del estado" v-model="searchState">
       </label>
 
       <input type="submit" value="Buscar">
@@ -41,17 +41,17 @@
         <label>
           <span>Nombre</span>
           <br>
-          <input type="text" placeholder="Nombre de la categoria" v-model="modCat">
+          <input type="text" placeholder="Nombre del estado" v-model="modState">
         </label>
         <input type="submit" value="Modificar">
       </form>
     </template>
     <template v-else-if="list.length > 0">
-      <div class="category-list">
-        <div v-for="category in list" :key="category._id" class="category">
-          <p class="header">{{category.nombre}}</p>
+      <div class="state-list">
+        <div v-for="state in list" :key="state._id" class="state">
+          <p class="header">{{state.nombre}}</p>
           <div>
-            <a @click.prevent="setMod(category)">Modificar</a>
+            <a @click.prevent="setMod(state)">Modificar</a>
           </div>        
         </div>
 
@@ -99,7 +99,7 @@
         height: 70px;
   }
 
-  .category {
+  .state {
     width: 40%;
     left: 50%;
     transform: translateX(-50%);
@@ -112,20 +112,20 @@
     box-shadow: 0px 0px 3px 0px rgba(0,0,0,0.75);
   }
 
-  .category div {
+  .state div {
     display: flex;
     justify-content: space-between;
     padding: 5px;
   }
 
-  div.category-list .header {
+  div.state-list .header {
     text-align: left;
     padding: 3px;
     background-color: #5d4954b0;
     color: #ececec;
   }
 
-  div.category-list input {
+  div.state-list input {
     width: 20% !important;
     left: 50%;
     transform: translateX(-50%);
@@ -210,14 +210,14 @@
 <script type="text/javascript">
 import {trim, isEmpty} from '../../classes/mainFunctions'
 export default {
-  name: 'categoryView',
+  name: 'articleState',
   data () {
     return {
       list: [],
       modifying: null,
-      newCat: '',
-      searchCat: '',
-      modCat: '',
+      newState: '',
+      searchState: '',
+      modState: '',
       insert: true,
       loader: null,
       timmer: null,
@@ -225,30 +225,30 @@ export default {
     }
   },
   methods: {
-  	setMod (category) {
-  	  this.modCat = category.nombre
-  	  this.modifying = category
+  	setMod (state) {
+  	  this.modState = state.nombre
+  	  this.modifying = state
   	},
     save () {
       this.$root.blur()
       this.isSending = true
 
-      this.newCat = trim(this.newCat)
+      this.newState = trim(this.newState)
 
-      if (isEmpty(this.newCat)) {
+      if (isEmpty(this.newState)) {
       	this.isSending = false
         this.$root.alert({
-          text: 'El nombre de la categoria no puede estar vacio'
+          text: 'El nombre del estado no puede estar vacio'
         })
         return
       }
 
       this.$root.confirm({
         onCancel: () => this.isSending = false,
-        text: `¿Desea crear la categoria ${this.newCat}?`,
+        text: `¿Desea agregar el estado ${this.newState}?`,
         callback: () => {
-          this.$root.axios.put("/category", JSON.stringify({
-            nombre: this.newCat
+          this.$root.axios.put("/article/state", JSON.stringify({
+            nombre: this.newState
           }))
           .then(response => {
 	        if (response.data.code !== 200) {
@@ -259,10 +259,10 @@ export default {
 	          return
 	        }
 
-	        this.newCat = ''
+	        this.newState = ''
 
 	        this.$root.window({
-              message: 'Categoria creada exitosamente',
+              message: 'Estado creado exitosamente',
               type: 'success'
             })
             this.newSearch()
@@ -283,7 +283,7 @@ export default {
     },
     newSearch() {
       this.modifying = null
-      this.modCat = ''
+      this.modState = ''
       this.list = []
       this.search()
     },
@@ -291,15 +291,15 @@ export default {
       this.isSending = true
 
       let search = {}
-      if (!isEmpty(this.searchCat)) {
-        search.nombre = trim(this.searchCat)
+      if (!isEmpty(this.searchState)) {
+        search.nombre = trim(this.searchState)
       }
 
       if (this.list.length > 0) {
         search.last = this.list[this.list.length -1]._id
       }
 
-      this.$root.axios.get("/category", {
+      this.$root.axios.get("/article/state", {
         params: search
       })
       .then(response => {
@@ -324,21 +324,21 @@ export default {
     modify () {
       this.isSending = true
 
-      this.modCat = trim(this.modCat)
+      this.modState = trim(this.modState)
 
-      if (isEmpty(this.modCat)) {
+      if (isEmpty(this.modState)) {
         this.$root.alert({
-          text: 'El nombre de la categoria no puede estar vacio'
+          text: 'El nombre del estado no puede estar vacio'
         })
         return
       }
 
       this.$root.confirm({
         onCancel: () => this.isSending = false,
-        text: `¿Desea cambiar el nombre de la categoria a ${this.modCat}?`,
+        text: `¿Desea cambiar el nombre del estado a ${this.modState}?`,
         callback: () => {
-          this.$root.axios.patch("/category", JSON.stringify({
-            nombre: this.modCat,
+          this.$root.axios.patch("/article/state", JSON.stringify({
+            nombre: this.modState,
             _id: this.modifying._id
           }))
           .then(response => {
@@ -351,7 +351,7 @@ export default {
 	        }
 
 	        this.$root.window({
-              message: 'Categoria actualizada exitosamente',
+              message: 'Estado actualizado exitosamente',
               type: 'success'
             })
 	      }).catch(err => {
