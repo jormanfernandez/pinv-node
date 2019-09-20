@@ -53,6 +53,10 @@ new Vue({
           name: 'Departamento'
         },
         {
+          url: '/mark',
+          name: 'Marcas'
+        },
+        {
           url: '/article/state',
           name: 'Estado de Articulos'
         },

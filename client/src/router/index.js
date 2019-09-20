@@ -7,6 +7,7 @@ import personModify from '@/views/person/modify'
 import userCreate from '@/views/user/create'
 import userModify from '@/views/user/modify'
 import categoryView from '@/views/category/view'
+import markView from '@/views/marks/view'
 import departmentView from '@/views/department/view'
 import articleState from '@/views/article/state'
 
@@ -43,6 +44,11 @@ export default new Router({
       path: '/category',
       name: 'categoryView',
       component: categoryView
+    },
+    {
+      path: '/mark',
+      name: 'markView',
+      component: markView
     },
     {
       path: '/department',

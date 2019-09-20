@@ -5,6 +5,7 @@ const personRouter = require("./persons/middleware");
 const categoryRouter = require("./category/middleware");
 const departmentRouter = require("./department/middleware");
 const articleStateRouter = require("./articleState/middleware");
+const markRouter = require("./marks/middleware");
 
 /**/
 // Middlewares
@@ -48,7 +49,7 @@ router.use("/department/*", (req, res) => {
 });
 console.log(`********* Done setting Department Middlewares`);
 
-console.log(`********* Setting Article Middlewares`);
+console.log(`********* Setting Article State Middlewares`);
 articleStateRouter.forEach(route => router.use("/article/state", route));
 router.use("/article/state/*", (req, res) => {
 	res.send({
@@ -63,7 +64,24 @@ router.use("/article/*", (req, res) => {
 		message: `Ruta equivocada`
 	});
 });
-console.log(`********* Done setting Article Middlewares`);
+console.log(`********* Done setting Article State Middlewares`);
+
+console.log(`********* Setting Marks Middlewares`);
+markRouter.forEach(route => router.use("/mark", route));
+router.use("/mark/*", (req, res) => {
+	res.send({
+		code: 500,
+		message: `Ruta equivocada`
+	});
+});
+
+router.use("/mark/*", (req, res) => {
+	res.send({
+		code: 500,
+		message: `Ruta equivocada`
+	});
+});
+console.log(`********* Done setting Marks Middlewares`);
 /**/
 
 module.exports = router;
