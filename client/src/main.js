@@ -171,8 +171,17 @@ new Vue({
       if (excludedpath.indexOf(path) > -1) {
         return true
       }
+      
+      let exists = false
 
-      return true
+      for (let route of this.user.access) {
+        if (route.url == path) {
+          exists = true
+          break
+        }
+      }
+
+      return exists
     }
   },
   router,
