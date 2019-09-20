@@ -20,6 +20,8 @@
       <userLogin></userLogin>
     </div>
 
+    <Footer></Footer>
+
     <Alert v-for="value in $root.alerts" :key="value.id" :data="value"></Alert>
     <Confirm v-for="value in $root.confirms" :key="value.id" :data="value"></Confirm>
     <Prompt v-for="value in $root.prompts" :key="value.id" :data="value"></Prompt>
@@ -41,9 +43,10 @@ import Alert from './views/modals/alert'
 import Confirm from './views/modals/confirm'
 import Prompt from './views/modals/prompt'
 import Window from './views/modals/window'
+import Footer from './views/footer'
 
 export default {
   name: 'App',
-  components: {userLogin, navMenu, Alert, Confirm, Prompt, Window}
+  components: {userLogin, navMenu, Alert, Confirm, Prompt, Window, Footer}
 }
 </script>
