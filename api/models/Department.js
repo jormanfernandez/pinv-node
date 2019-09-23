@@ -1,7 +1,7 @@
 const mongoose = global.mongoose;
 const departmentSchema = new mongoose.Schema({
+	created_date: Date,
 	nombre: String,
-	created_date: Date
 });
 
 const Department = mongoose.model("department", departmentSchema);

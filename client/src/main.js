@@ -6,7 +6,7 @@ import App from './App'
 import router from './router'
 import User from './classes/User'
 import axios from 'axios'
-import {isEmpty, generateId} from './classes/mainFunctions'
+import {isEmpty, generateId} from './classes/methods'
 
 Vue.config.productionTip = false
 Vue.use(VueCookies)
@@ -22,6 +22,7 @@ new Vue({
         url: 'http://localhost',
         port: 8080
       },
+      scrollTop: false,
       alerts: [],
       prompts: [],
       confirms: [],
@@ -62,15 +63,15 @@ new Vue({
         },
         {
           url: '/article/add',
-          name: 'Agregar Articulo al inventario'
+          name: 'Agregar Articulo'
         },
         {
-          url: '/article/modify',
-          name: 'Ver y Modificar Articulos'
+          url: '/article/list',
+          name: 'Ver Articulos'
         },
         {
           url: '/article/assign',
-          name: 'Asignar articulos'
+          name: 'Gestion de articulos'
         },
         {
           url: '/report',
@@ -86,7 +87,6 @@ new Vue({
         document.activeElement.blur();
       }
     },
-
     alert (options) {
       this.blur()
       options.id = generateId(15)
@@ -163,7 +163,7 @@ new Vue({
       return `${this.api.url}:${this.api.port}/api`
     },
     routeAvailable () {
-      const path = this._route.fullPath
+      let path = this._route.fullPath
       const excludedpath = [
         '/'
       ]
@@ -171,7 +171,14 @@ new Vue({
       if (excludedpath.indexOf(path) > -1) {
         return true
       }
-      
+
+      let test = path.split('/')
+
+      if (test.length > 3) {
+        test.length = 3
+        path = test.join('/')
+      }
+
       let exists = false
 
       for (let route of this.user.access) {
@@ -235,5 +242,9 @@ new Vue({
     setTimeout(() => {
       screen.classList.add('fadeOut')
     }, 200)
+
+    window.addEventListener('scroll', () => {
+      this.scrollTop = window.pageYOffset > 150
+    })
   }
 })

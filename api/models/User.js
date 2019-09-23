@@ -1,10 +1,13 @@
 const mongoose = global.mongoose;
 const userSchema = new mongoose.Schema({
-	nick: String,
-	password: String,
-	person: {type: mongoose.Schema.Types.ObjectId, ref: "personas"},
+	person: {
+		type: mongoose.Schema.Types.ObjectId, 
+		ref: "personas"
+	},
 	created_date: Date,
-	access: Object
+	password: String,
+	access: Object,
+	nick: String,
 });
 
 userSchema.methods.logIn = function (session, callback) {

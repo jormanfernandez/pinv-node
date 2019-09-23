@@ -208,7 +208,7 @@
 </style>
 
 <script type="text/javascript">
-import {trim, isEmpty} from '../../classes/mainFunctions'
+import {trim, isEmpty} from '../../classes/methods'
 export default {
   name: 'articleState',
   data () {
@@ -388,6 +388,6 @@ export default {
         }, 250)
       }
     }
-  },
+  }
 }
 </script>

@@ -159,7 +159,7 @@
 </style>
 
 <script type="text/javascript">
-  import {trim, isEmpty} from '../../classes/mainFunctions'
+  import {trim, isEmpty} from '../../classes/methods'
   export default {
     name: 'userCreate',
     data () {

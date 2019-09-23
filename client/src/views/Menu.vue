@@ -7,11 +7,12 @@
         <li>
           <router-link to="/">Inicio</router-link>
         </li>
-        <li v-for="(link, idx) in $root.user.access" :key="idx">
+        <li v-for="(link, idx) in $root.user.access" 
+          :key="idx" v-show="link.url != '/article/assign'">
           <router-link :to="link.url">{{link.name}}</router-link>
         </li>
         <li v-if="$root.user.logged">
-          <a href="#salir" @click.prevent="logout">Salir</a>
+          <a href="#" @click.prevent="logout">Salir</a>
         </li>
       </ul>
       <div class="burger" @click="show = !show">
@@ -64,7 +65,7 @@ export default {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    min-height: 8vh;
+    min-height: 10%;
     background-color: #5d4954;
     font-family: Helvetica, 'san-serif';
   }
@@ -84,8 +85,9 @@ export default {
     width: 30%;
     position: absolute;
     right: 0px;
-    height: 100%;
-    top: 8vh;
+    height: 90%;
+    overflow-y: auto;
+    top: 6%;
     background-color: #5d4954;
     transform: translateX(100%);
     transition: transform 0.5s ease-in;

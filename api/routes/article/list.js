@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Department = require("../../models/Department");
+const Article = require("../../models/Article");
 
 router.get("/", (req, res) => {
 
@@ -19,6 +19,25 @@ router.get("/", (req, res) => {
 		}
 	}
 
+	if (param.serial && !isEmpty(param.serial)) {
+		search.serial = {
+			$regex: `.*${param.serial}.*`,
+			$options: 'ix'
+		}
+	}
+
+	if (param.category && !isEmpty(param.category)) {
+		search.category = param.category
+	}
+
+	if (param.mark && !isEmpty(param.mark)) {
+		search.mark = param.mark
+	}
+
+	if (param.state && !isEmpty(param.state)) {
+		search.state = param.state
+	}
+
 	if(param.last && !isEmpty(param.last)) {
 		last  = {
 			'_id': {
@@ -27,12 +46,15 @@ router.get("/", (req, res) => {
 		}
 	}
 
-	let query = Department.find(Object.assign(last, search));
+	let query = Article.find(Object.assign(last, search))
+		.populate("mark", "nombre _id")
+		.populate("state", "nombre _id")
+		.populate("category", "nombre _id");
 
-	if (!param.all) {
+	if(!param.all) {
 		query = query.limit(limit);
 	}
-
+	
 	query.exec((err, response) => {
 		if (err) {
 			res.send({

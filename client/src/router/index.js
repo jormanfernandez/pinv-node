@@ -10,10 +10,14 @@ import categoryView from '@/views/category/view'
 import markView from '@/views/marks/view'
 import departmentView from '@/views/department/view'
 import articleState from '@/views/article/state'
+import articleAdd from '@/views/article/add'
+import articleList from '@/views/article/list'
+import articleAssign from '@/views/article/assign'
 
 Vue.use(Router)
 
 export default new Router({
+  mode: 'history',
   routes: [
     {
       path: '/',
@@ -59,6 +63,26 @@ export default new Router({
       path: '/article/state',
       name: 'articleState',
       component: articleState
+    },
+    {
+      path: '/article/add',
+      name: 'articleAdd',
+      component: articleAdd
+    },
+    {
+      path: '/article/assign',
+      name: 'articleAssign',
+      component: articleAssign
+    },
+    {
+      path: '/article/assign/:serial',
+      name: 'articleAssign',
+      component: articleAssign
+    },
+    {
+      path: '/article/list',
+      name: 'articleList',
+      component: articleList
     },
     {
       path: '*',

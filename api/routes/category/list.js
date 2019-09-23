@@ -27,7 +27,12 @@ router.get("/", (req, res) => {
 		}
 	}
 
-	const query = Category.find(Object.assign(last, search)).limit(limit);
+	let query = Category.find(Object.assign(last, search));
+
+	if(!param.all) {
+		query = query.limit(limit);	
+	}
+	
 	query.exec((err, response) => {
 		if (err) {
 			res.send({

@@ -1,9 +1,9 @@
 const mongoose = global.mongoose;
 const personSchema = new mongoose.Schema({
-	nombre: String,
+	created_date: Date,
 	apellido: String,
+	nombre: String,
 	cedula: Number,
-	created_date: Date
 });
 
 const Person = mongoose.model("personas", personSchema);

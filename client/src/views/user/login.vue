@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import {isEmpty} from '../../classes/mainFunctions'
+import {isEmpty} from '../../classes/methods'
 export default {
   name: 'userLogin',
   data () {

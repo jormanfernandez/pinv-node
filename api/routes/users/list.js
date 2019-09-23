@@ -48,7 +48,7 @@ router.get("/", async (req, res) => {
 
 	const query = User.find(Object.assign(last, search), {
 		password: 0
-	}).limit(limit);
+	}).populate("person").limit(limit);
 	query.exec((err, response) => {
 		if (err) {
 			res.send({

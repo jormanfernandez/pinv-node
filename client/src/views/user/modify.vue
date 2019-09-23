@@ -35,6 +35,12 @@
       <div v-else class="user-list">
         <div v-for="user in list" :key="user._id" class="user">
           <p class="header">{{user.nick}}</p>
+          <p>
+            Pertenece a: {{user.person.nombre}} {{user.person.apellido}}
+          </p>
+          <p>
+            Cedula: {{user.person.cedula}}
+          </p>
           <div>
             <a @click.prevent="setModify(user)">Modificar</a>
           </div>        
@@ -251,7 +257,7 @@
 </style>
 
 <script type="text/javascript">
-import {trim, isEmpty} from '../../classes/mainFunctions'
+import {trim, isEmpty} from '../../classes/methods'
 export default {
   name: 'userModify',
   data () {

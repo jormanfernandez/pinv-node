@@ -11,6 +11,7 @@
 				:maxlength="data.maxlength ? data.maxlength : null"
 				:max="data.max ? data.max : null"
 				:min="data.min ? data.min : null"
+				@keyup.enter="accept"
 				v-model="value"
 				class="field"
 				ref="field"

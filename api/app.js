@@ -52,8 +52,11 @@ app.use("/api", async (req, res, next) => {
 		logged: false
 	}
 
-	console.log("***** method: ", req.method);
-	console.log("***** uri: ", req.originalUrl);
+	const {detectIp, detectBrowser, createId} = require("./app/principals");
+	const ip = detectIp(req);
+	const browser = detectBrowser(req);
+
+	console.log(`*** *: Method: ${req.method} - URI: ${req.originalUrl} - From: ${ip}`);
 
 	let oAuth = req.get("Authorization");
 
@@ -66,10 +69,6 @@ app.use("/api", async (req, res, next) => {
 	}
 
 	const Session = require("./models/Sessions");
-
-	const {detectIp, detectBrowser, createId} = require("./app/principals");
-	const ip = detectIp(req);
-	const browser = detectBrowser(req);
 
 	let response = "";
 
@@ -169,6 +168,7 @@ db.once("open", () => {
 	const gc = setInterval(() => {
 
 		const Session = require("./models/Sessions");
+		console.log("********* Cleaning sessions");
 
 		let date = new Date();
 		date.setTime(date.getTime() - (1000 * 60 * 60 * 24 * 2))

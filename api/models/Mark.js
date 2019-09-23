@@ -1,7 +1,7 @@
 const mongoose = global.mongoose;
 const markSchema = new mongoose.Schema({
+	created_date: Date,
 	nombre: String,
-	created_date: Date
 });
 
 const Mark = mongoose.model("marks", markSchema);
