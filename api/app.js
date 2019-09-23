@@ -129,6 +129,7 @@ const dbUrl = `${process.env.DB_HOST}:${process.env.DB_PORT}`;
 			`mongodb://${dbUrl}/${process.env.DB_NAME}`, 
 			{
 				useNewUrlParser: true,
+				useUnifiedTopology: true,
 				reconnectTries: Number.MAX_VALUE,
 				reconnectInterval: 500,
 				poolSize: 20,
