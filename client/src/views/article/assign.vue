@@ -292,6 +292,117 @@ export default {
     }
   },
   methods: {
+    manage () {
+      this.isSending = true
+      this.note = trim(this.note ? this.note : '')
+
+      if (!this.validState) {
+        this.isSending = false
+        return this.$root.alert({
+          text: 'Debe indicar en que estado se encuentra el objeto'
+        })
+      }
+
+      let action = ''
+
+      if (!isEmpty(this.department)) {
+        if (!this.departmentExists(this.department)) {
+          this.isSending = false
+          return this.$root.alert({
+            text: 'Departamento no existe'
+          })
+        }
+
+        if (isNaN(this.puesto)) {
+          this.puesto = null
+        }
+
+        if (isNaN(this.cedula)) {
+          this.cedula = null
+        }
+
+        if (isNaN(this.puesto) && this.cedula < 500000) {
+          this.isSending = false
+          return this.$root.alert({
+            text: 'Debe indicar donde sera asignado el articulo'
+          })
+        }
+
+      } else {
+        this.department = ''
+        this.cedula = null
+        this.puesto = null
+      }
+
+      if (!this.department) {
+        action = '¿Desea inventariar el objeto con el estatus indicado?'
+      } else {
+        action = '¿Desa asignar el objeto en el departamento seleccionado?'
+      }
+
+      this.$root.confirm({
+        text: action,
+        onCancel: () => this.isSending = false,
+        callback: () => {
+          this.$root.axios.put("/inventory", JSON.stringify({
+            article: this.article._id,
+            department: this.department,
+            state: this.state,
+            cedula: this.cedula,
+            puesto: this.puesto,
+            note: this.note
+          })).then(response => {
+            if (response.data.code != 200) {
+              return this.$root.window({
+                type: 'error',
+                message: response.data.message
+              })
+            }
+
+            this.$root.window({
+              type: 'success',
+              message: response.data.message
+            })
+
+            this.cedula = null
+            this.puesto = null
+            this.department = ''
+            this.article.state = this.getStateObject(this.state)
+          }).catch(err => {
+            this.$root.window({
+              message: err,
+              type: 'error'
+            })
+          }).finally(() => this.isSending = false)
+        }
+      })
+    },
+    getStateObject (state) {
+        let obj = {
+          _id: '',
+          nombre: ''
+        }
+
+      for (let item of this.states) {
+        if (item._id == state) {
+          obj = item;
+          break;
+        }
+      }
+
+      return obj
+    },
+    departmentExists (department) {
+      let exists = false
+
+      for (let dep of this.departments) {
+        if (dep._id == department) {
+          exists = true
+        }
+      }
+
+      return exists
+    },
     getArticle () {
       if (isEmpty(this.serial)) {
         this.article = null
@@ -427,7 +538,6 @@ export default {
   },
   filters: {
     name: name => {
-      console.log(name)
       return isEmpty(name) ? 'Sin Nombre' : name
     },
     datetime: datetime => {

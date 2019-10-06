@@ -13,6 +13,7 @@ import articleState from '@/views/article/state'
 import articleAdd from '@/views/article/add'
 import articleList from '@/views/article/list'
 import articleAssign from '@/views/article/assign'
+import Report from '@/views/report/index'
 
 Vue.use(Router)
 
@@ -83,6 +84,11 @@ export default new Router({
       path: '/article/list',
       name: 'articleList',
       component: articleList
+    },
+    {
+      path: '/report',
+      name: 'Report',
+      component: Report
     },
     {
       path: '*',

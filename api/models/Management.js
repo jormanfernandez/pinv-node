@@ -1,5 +1,5 @@
 const mongoose = global.mongoose;
-const inventorySchema = new mongoose.Schema({
+const manageSchema = new mongoose.Schema({
 	department: {
 		type: mongoose.Schema.Types.ObjectId, 
 		ref: "departments"
@@ -22,6 +22,6 @@ const inventorySchema = new mongoose.Schema({
 	note: String,
 });
 
-const Inventory = mongoose.model("inventory", inventorySchema);
+const Manage = mongoose.model("managements", manageSchema);
 
-module.exports = Inventory;
+module.exports = Manage;

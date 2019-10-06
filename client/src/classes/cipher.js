@@ -114,3 +114,5 @@ class Cipher {
       return this._revertir(result);
   }
 }
+
+export default Cipher

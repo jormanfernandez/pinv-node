@@ -165,8 +165,11 @@ new Vue({
     routeAvailable () {
       let path = this._route.fullPath
       const excludedpath = [
-        '/'
+        '/',
+        '/#/'
       ]
+
+      console.log(path)
 
       if (excludedpath.indexOf(path) > -1) {
         return true

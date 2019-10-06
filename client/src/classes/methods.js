@@ -164,3 +164,13 @@ export const generateId = length => {
 
   return id;
 }
+export const objectToCsv = array => {
+    let keys = Object.keys(array[0])
+    let result = keys.join("\t") + "\n"
+
+    array.forEach(function(obj){
+        result += keys.map(k => obj[k]).join("\t") + "\n"
+    })
+
+    return result
+}
