@@ -2,7 +2,7 @@ const mongoose = global.mongoose;
 const manageSchema = new mongoose.Schema({
 	department: {
 		type: mongoose.Schema.Types.ObjectId, 
-		ref: "departments"
+		ref: "department"
 	},
 	state: {
 		type: mongoose.Schema.Types.ObjectId, 

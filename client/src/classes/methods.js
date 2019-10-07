@@ -164,13 +164,68 @@ export const generateId = length => {
 
   return id;
 }
-export const objectToCsv = array => {
-    let keys = Object.keys(array[0])
-    let result = keys.join("\t") + "\n"
+export const objectToCsv = (objArray) => {
+    let array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray
+    let str = ''
 
-    array.forEach(function(obj){
-        result += keys.map(k => obj[k]).join("\t") + "\n"
+    console.log(array)
+
+    array.forEach(value => {
+      let line = '';
+      for (let index in value) {
+          line += value[index];
+            line += ','
+      }
+      line = line.substr(0, line.length -1)
+
+      str += `${line}\r\n`;
     })
 
-    return result
+    return str;
+}
+export const exportCSV = (items, filename) => {
+  let headers = {}
+
+  for(let key of Object.keys(items[0])) {
+    headers[key] = key
+  }
+
+  items.unshift(headers)
+  const jsonObject = JSON.stringify(items)
+  const csv = objectToCsv(jsonObject)
+
+  console.log(csv)
+
+  const exportedFilenmae = filename || 'export.csv'
+
+  let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  if (navigator.msSaveBlob) {
+    navigator.msSaveBlob(blob, exportedFilenmae)
+  } else {
+    const link = document.createElement('a')
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob)
+      link.setAttribute('href', url)
+      link.setAttribute('download', exportedFilenmae)
+      link.style.visibility = 'hidden'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    }
+  }
+}
+export const getDateLang = () => {
+  let lang = {
+    "_language": "English",
+    "_months": meses,
+    "_days": dias.map(value => value.substr(0, 3)),
+    "rtl": false,
+    "ymd": false,
+    "yearSuffix": ""
+  }
+  lang._monthsAbbr = lang._months.map(value => value.substr(0, 3))
+  lang.months = lang._months
+  lang.monthsAbbr = lang._monthsAbbr
+  lang.days = lang._days
+  return lang
 }

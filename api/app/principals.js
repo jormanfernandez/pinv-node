@@ -7,6 +7,9 @@
  * **************
  **/
 const isEmpty = (val) => {
+  if (!val) {
+    return true;
+  }
   switch (typeof val) {
     case 'object':
 
@@ -250,6 +253,36 @@ const junkPassword = (password, salt) => {
   return sha256(cipher.cifrar(password));
 }
 
+
+const extractDate = date => {
+  date = date instanceof Date ? date : new Date(date)
+
+  const day = date.getDate()
+  const month = date.getMonth() + 1
+  const year = date.getFullYear()
+  const time = [
+    day.toString().padStart(2, '0'),
+    month.toString().padStart(2, '0'),
+    year
+  ]
+
+  return time.join('/')
+}
+
+const extractTime = date => {
+  date = date instanceof Date ? date : new Date(date)
+  const hour = date.getHours()
+  const pm = hour > 12
+
+  const time = [
+    (pm ? hour - 12 : hour).toString().padStart(2, '0'),
+    date.getMinutes().toString().padStart(2, '0'),
+    date.getSeconds().toString().padStart(2, '0')
+  ]
+
+  return `${time.join(':')} ${!pm ? 'am' : 'pm'}`
+}
+
 module.exports = {
   isEmpty,
   trim,
@@ -260,5 +293,7 @@ module.exports = {
   createId,
   detectIp,
   detectBrowser,
-  junkPassword
+  junkPassword,
+  extractTime,
+  extractDate
 };

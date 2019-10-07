@@ -8,6 +8,7 @@ const articleStateRouter = require("./articleState/middleware");
 const articleRouter = require("./article/middleware");
 const markRouter = require("./marks/middleware");
 const inventoryRouter = require("./inventory/middleware");
+const reportRouter = require("./reports/middleware");
 
 /**/
 // Middlewares
@@ -42,6 +43,10 @@ console.log(`********* Done setting Marks Middlewares`);
 console.log(`********* Setting Inventory Middlewares`);
 inventoryRouter.forEach(route => router.use("/inventory", route));
 console.log(`********* Done setting Inventory Middlewares`);
+
+console.log(`********* Setting Reports Middlewares`);
+reportRouter.forEach(route => router.use("/report", route));
+console.log(`********* Done setting Reports Middlewares`);
 
 router.use("*", (req, res) => {
 	res.send({

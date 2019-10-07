@@ -442,7 +442,7 @@ export default {
           return
         }
 
-        this.marks = this.marks.concat(response.data.message)
+        this.marks = response.data.message
       }).catch(err => {
         this.$root.window({
           message: err,
@@ -467,7 +467,7 @@ export default {
           return
         }
 
-        this.categories = this.categories.concat(response.data.message)
+        this.categories = response.data.message
       }).catch(err => {
         this.$root.window({
           message: err,
@@ -492,7 +492,7 @@ export default {
           return
         }
 
-        this.states = this.states.concat(response.data.message)
+        this.states = response.data.message
       }).catch(err => {
         this.$root.window({
           message: err,

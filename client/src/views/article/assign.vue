@@ -448,7 +448,7 @@ export default {
           return
         }
 
-        this.states = this.states.concat(response.data.message)
+        this.states = response.data.message
       }).catch(err => {
         this.$root.window({
           message: err,
@@ -473,7 +473,7 @@ export default {
           return
         }
 
-        this.departments = this.departments.concat(response.data.message)
+        this.departments = response.data.message
       }).catch(err => {
         this.$root.window({
           message: err,
